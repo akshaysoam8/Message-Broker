@@ -7,6 +7,9 @@ var chokidar = require('chokidar');
 var redis = require('redis');
 var nodemailer = require('nodemailer');
 var chalk = require('chalk');
+var nconf = require('nconf');
+
+nconf.file(path.join('Config', 'config.json'));
 
 var client = redis.createClient();
 var mailparser = new mailParser();
@@ -23,9 +26,8 @@ console.log = function (data, color) {
   logStream.write(data + '\n');
 }
 
-server.listen(1000, function () {
-  //console.log(chalk.green('Server is running...'));
-  console.log('Server is running...', 'green');
+server.listen(nconf.get('serverPort'), function () {
+  console.log('Server is running on port ' + nconf.get('serverPort') +'...', 'green');
 });
 
 client.on('error', function (err) {
@@ -96,8 +98,8 @@ function sendEmail(data, done) {
   var transporter = nodemailer.createTransport({
       service: 'Gmail',
       auth: {
-          user: 'dockerresourcemanagement@gmail.com',
-          pass: 'Akshay24@'
+          user: nconf.get('adminEmail'),
+          pass: nconf.get('adminPassword')
       }
   });
 
@@ -121,8 +123,8 @@ function sendEmail(data, done) {
   });
 }
 
-process.once( 'SIGTERM', function (sig) {
-  queue.shutdown( 5000, function(err) {
+process.once('SIGTERM', function (sig) {
+  queue.shutdown(5000, function(err) {
     console.log('Kue shutdown: ', err ||'' );
     process.exit( 0 );
   });
