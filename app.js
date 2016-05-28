@@ -13,17 +13,28 @@ var mailparser = new mailParser();
 var server = http.createServer();
 var queue = kue.createQueue();
 
+var logStream = fs.createWriteStream(path.join('Logs', 'log.txt'));
+
+console.log = function (data, color) {
+  if(color == 'undefined')
+    color = 'white';
+
+  process.stdout.write(chalk[color](data + '\n'));
+  logStream.write(data + '\n');
+}
+
 server.listen(1000, function () {
-  console.log(chalk.green('Server is running...'));
+  //console.log(chalk.green('Server is running...'));
+  console.log('Server is running...', 'green');
 });
 
 client.on('error', function (err) {
-  console.log(chalk.red('Error while connecting to redids'));
+  console.log('Error while connecting to redids', 'red');
   console.log(err);
 });
 
 client.on('ready', function () {
-  console.log(chalk.green('Redis Cache is ready'));
+  console.log('Redis Cache is ready', 'green');
 });
 
 chokidar.watch('Data/Email').on('all', function (event, filename) {
@@ -33,7 +44,7 @@ chokidar.watch('Data/Email').on('all', function (event, filename) {
       newEmail(filename);
 
     else
-      console.log(chalk.red('Invalid file format'));
+      console.log('Invalid file format... "' + filename + '" skipped', 'red');
   }
 });
 
@@ -44,7 +55,7 @@ function getFileExtension(filename) {
 }
 
 function newEmail(filename) {
-  console.log(chalk.blue('New Email to be sent'));
+  console.log('New Email to be sent', 'blue');
 
   mailparser.on('end', function(mail_object){
     var options = {
@@ -60,8 +71,8 @@ function newEmail(filename) {
         console.log(chalk.red(err));
 
       else {
-        console.log(chalk.blue('New Email queued'));
-        console.log(chalk.yellow('job.id : ' + job.id));
+        console.log('New Email queued', 'blue');
+        console.log('job.id : ' + job.id, 'yellow');
       }
     });
   });
@@ -98,13 +109,13 @@ function sendEmail(data, done) {
   };
 
   transporter.sendMail(mailOptions, function (error, info) {
-    console.log(chalk.magenta('Sending the mail'));
+    console.log('Sending the mail', 'magenta');
 
     if (error)
-      console.log(chalk.red(error));
+      console.log(error, 'red');
 
     else
-      console.log(chalk.cyan('Message sent : ' + info.response));
+      console.log('Message sent : ' + info.response, 'cyan');
 
     done();
   });
