@@ -28,8 +28,20 @@ client.on('ready', function () {
 
 chokidar.watch('Data/Email').on('all', function (event, filename) {
   if(event == 'add' && filename)
-    newEmail(filename);
+  {
+    if(getFileExtension(filename) == '.eml')
+      newEmail(filename);
+
+    else
+      console.log(chalk.red('Invalid file format'));
+  }
 });
+
+function getFileExtension(filename) {
+  var index = filename.lastIndexOf('.');
+
+  return filename.substring(index);
+}
 
 function newEmail(filename) {
   console.log(chalk.blue('New Email to be sent'));
