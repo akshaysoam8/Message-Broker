@@ -1,5 +1,5 @@
 {
   "serverPort" : 1000,
-  "adminEmail" : "dockerresourcemanagement@gmail.com",
-  "adminPassword" : "Akshay24@"
+  "adminEmail" : "",
+  "adminPassword" : ""
 }
